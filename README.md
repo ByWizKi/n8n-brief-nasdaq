@@ -6,14 +6,14 @@ Chaque matin, les analystes consultent plusieurs sites pour savoir ce qui s'est 
 C'est répétitif, chronophage et pas toujours efficace.
 
 ## Objectif
-Je voulais créer un outil simple :  
+Je voulais créer un outil simple.  
 Un rapport Nasdaq clair, généré automatiquement, livré tous les jours à **15h00 (heure de Paris)** directement sur **Telegram**.  
 Pas de clics, pas de recherches manuelles. Juste l'info essentielle au bon moment.
 
 ---
 
 ## La solution
-J’ai construit un **workflow avec n8n (self-hosted)** qui :  
+J'ai construit un **workflow avec n8n (self-hosted)** qui :  
 1. Se déclenche automatiquement à 15h30 grâce à un Cron.  
 2. Récupère les données **Nasdaq Futures** via Yahoo Finance (high, low, volume, variation).  
 3. Nettoie et organise ces données dans un **rapport HTML**.  
@@ -24,7 +24,7 @@ J’ai construit un **workflow avec n8n (self-hosted)** qui :
 
 ## Résultat
 - Chaque jour, un **rapport uniforme** et lisible est généré sans effort.  
-- Les analystes reçoivent un résumé clair **avant l’ouverture US**.  
+- Les analystes reçoivent un résumé clair **avant l'ouverture US**.  
 - Le PDF contient : top movers, variations, volumes et points clés.  
 
 ---
@@ -46,7 +46,7 @@ Voici quelques visuels du projet :
 
 ---
 
-## 🔑 Points intéressants
+## Points intéressants
 - Parsing JSON de Yahoo Finance.  
 - Différence entre sessions pre-market et régulières.  
 - Génération HTML stylisée vers PDF.  
