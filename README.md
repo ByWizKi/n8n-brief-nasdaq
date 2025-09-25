@@ -7,24 +7,24 @@ C'est répétitif, chronophage et pas toujours efficace.
 
 ## Objectif
 Je voulais créer un outil simple.  
-Un rapport Nasdaq clair, généré automatiquement, livré tous les jours à **15h00 (heure de Paris)** directement sur **Telegram**.  
+Un rapport Nasdaq clair, généré automatiquement, livré tous les jours à 15h00 (heure de Paris) directement sur Telegram.  
 Pas de clics, pas de recherches manuelles. Juste l'info essentielle au bon moment.
 
 ---
 
 ## La solution
-J'ai construit un **workflow avec n8n (self-hosted)** qui :  
+J'ai construit un workflow avec n8n (self-hosted) qui :  
 1. Se déclenche automatiquement à 15h30 grâce à un Cron.  
-2. Récupère les données **Nasdaq Futures** via Yahoo Finance (high, low, volume, variation).  
-3. Nettoie et organise ces données dans un **rapport HTML**.  
-4. Transforme le rapport en **PDF/Image**.  
-5. Envoie le tout dans un canal **Telegram privé**.  
+2. Récupère les données Nasdaq Futures via Yahoo Finance (high, low, volume, variation).  
+3. Nettoie et organise ces données dans un rapport HTML.  
+4. Transforme le rapport en PDF/Image.  
+5. Envoie le tout dans un canal Telegram privé.  
 
 ---
 
 ## Résultat
-- Chaque jour, un **rapport uniforme** et lisible est généré sans effort.  
-- Les analystes reçoivent un résumé clair **avant l'ouverture US**.  
+- Chaque jour, un rapport uniforme et lisible est généré sans effort.  
+- Les analystes reçoivent un résumé clair avant l'ouverture US.  
 - Le PDF contient : top movers, variations, volumes et points clés.  
 
 ---
@@ -32,17 +32,14 @@ J'ai construit un **workflow avec n8n (self-hosted)** qui :
 ## Illustrations
 Voici quelques visuels du projet :  
 
-- **Schéma du workflow n8n**  
-*(capture ou export depuis n8n)*  
-![Workflow n8n](images/n8n-workflow.png)
+- **Schéma du workflow n8n**   
+![Workflow n8n](images/message.png)
 
-- **Exemple du rapport PDF**  
-*(aperçu du tableau généré)*  
+- **Exemple du rapport PDF**   
 ![Rapport PDF](images/report.png)
 
 - **Message reçu sur Telegram**  
-*(screenshot de la notification Telegram)*  
-![Message Telegram](images/message.png)
+![Message Telegram](images/n8n-workflow.png)
 
 ---
 
@@ -63,7 +60,7 @@ Voici quelques visuels du projet :
 ---
 
 ## Auteur
-Projet réalisé par **THIEBAUD Enzo**, étudiant en Master 2 Intelligence Artificielle.  
+Projet réalisé par THIEBAUD Enzo, étudiant en Master 2 Intelligence Artificielle.  
 À la recherche d'un **stage de fin d'études (5–6 mois dès février 2026)** sur Paris, Lyon ou Nice.  
 
 ---
