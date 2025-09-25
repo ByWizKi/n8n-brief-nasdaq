@@ -1,0 +1,182 @@
+{
+  "name": "Brief Nasdaq - Asie & Europe",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fcb534a6-d70b-4405-a9e0-22736cf8836d",
+      "name": "Schedule Trigger",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/NQ=F?interval=1d",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a27dc651-5819-4f6c-9455-244a3f0b1fcf",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Helpers\nfunction lastNonNull(arr) {\n  if (!arr || !arr.length) return null;\n  for (let i = arr.length - 1; i >= 0; i--) {\n    const v = arr[i];\n    if (v !== null && v !== undefined && !Number.isNaN(v)) return v;\n  }\n  return null;\n}\nfunction maxNonNull(arr) {\n  if (!arr || !arr.length) return null;\n  const f = arr.filter(v => v !== null && v !== undefined && !Number.isNaN(v));\n  return f.length ? Math.max(...f) : null;\n}\nfunction minNonNull(arr) {\n  if (!arr || !arr.length) return null;\n  const f = arr.filter(v => v !== null && v !== undefined && !Number.isNaN(v));\n  return f.length ? Math.min(...f) : null;\n}\nfunction fix2(n) {\n  return (typeof n === \"number\") ? Number(n.toFixed(2)) : n;\n}\n\n// ---- Parsing ----\nconst root = items[0].json;\nif (!root || !root.chart || root.chart.error) {\n  return [{ json: { error: root?.chart?.error || \"Chart payload missing\" } }];\n}\n\nconst res = root.chart.result?.[0];\nif (!res) {\n  return [{ json: { error: \"Empty chart.result\" } }];\n}\n\nconst meta = res.meta || {};\nconst q = res.indicators?.quote?.[0] || {};\n\n// Champs principaux\nconst dayHigh = (typeof meta.regularMarketDayHigh === \"number\") ? meta.regularMarketDayHigh : maxNonNull(q.high);\nconst dayLow  = (typeof meta.regularMarketDayLow  === \"number\") ? meta.regularMarketDayLow  : minNonNull(q.low);\nconst volume  = (typeof meta.regularMarketVolume  === \"number\") ? meta.regularMarketVolume  : lastNonNull(q.volume);\n\nconst current   = (typeof meta.regularMarketPrice === \"number\") ? meta.regularMarketPrice : lastNonNull(q.close);\nconst lastClose = (typeof meta.chartPreviousClose === \"number\") ? meta.chartPreviousClose : null;\n\nconst changePts = (current != null && lastClose != null) ? (current - lastClose) : null;\n\n// Session\nlet sessionLabel = \"unknown\";\ntry {\n  const now = Math.floor(Date.now() / 1000);\n  const reg = meta.currentTradingPeriod?.regular;\n  if (reg?.start && reg?.end) {\n    if (now >= reg.start && now <= reg.end) {\n      sessionLabel = \"regular\";\n    } else {\n      sessionLabel = (meta.instrumentType === \"FUTURE\") ? \"globex\" : \"pre-market\";\n    }\n  }\n} catch (_) {}\n\nreturn [{\n  json: {\n    symbol: meta.symbol || \"NQ=F\",\n    shortName: meta.shortName || \"Nasdaq 100\",\n    exchange: meta.fullExchangeName || meta.exchangeName || null,\n    instrumentType: meta.instrumentType || null,\n    timezone: meta.exchangeTimezoneName || meta.timezone || null,\n    session: sessionLabel,\n    lastClose: fix2(lastClose),\n    current: fix2(current),\n    changePoints: fix2(changePts),\n    dayHigh: fix2(dayHigh),\n    dayLow: fix2(dayLow),\n    volume\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "a8262701-dcd3-4801-91a1-34f9697c155b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "html": "<h2>Nasdaq Futures</h2>\n<table style=\"border-collapse: collapse; width: 100%; margin-bottom: 20px;\">\n  <tr style=\"background-color: #f2f2f2;\">\n    <th style=\"border: 1px solid #ddd; padding: 8px;\">Contrat</th>\n    <th style=\"border: 1px solid #ddd; padding: 8px;\">Session</th>\n    <th style=\"border: 1px solid #ddd; padding: 8px;\">Dernier</th>\n    <th style=\"border: 1px solid #ddd; padding: 8px;\">Clôture préc.</th>\n    <th style=\"border: 1px solid #ddd; padding: 8px;\">Variation (pts)</th>\n    <th style=\"border: 1px solid #ddd; padding: 8px;\">Plus Haut</th>\n    <th style=\"border: 1px solid #ddd; padding: 8px;\">Plus Bas</th>\n    <th style=\"border: 1px solid #ddd; padding: 8px;\">Volume</th>\n  </tr>\n  <tr>\n    <td style=\"border: 1px solid #ddd; padding: 8px;\">{{ $json[\"shortName\"] }}</td>\n    <td style=\"border: 1px solid #ddd; padding: 8px;\">{{ $json[\"session\"] }}</td>\n    <td style=\"border: 1px solid #ddd; padding: 8px;\">{{ $json[\"current\"] }}</td>\n    <td style=\"border: 1px solid #ddd; padding: 8px;\">{{ $json[\"lastClose\"] }}</td>\n    <td style=\"border: 1px solid #ddd; padding: 8px; color: {{ $json[\"changePoints\"] < 0 ? 'red' : 'green' }};\">\n      {{ $json[\"changePoints\"] }}\n    </td>\n    <td style=\"border: 1px solid #ddd; padding: 8px;\">{{ $json[\"dayHigh\"] }}</td>\n    <td style=\"border: 1px solid #ddd; padding: 8px;\">{{ $json[\"dayLow\"] }}</td>\n    <td style=\"border: 1px solid #ddd; padding: 8px;\">{{ $json[\"volume\"] }}</td>\n  </tr>\n</table>\n"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "7b9f49dc-03d5-4007-af75-dd3620416ec8",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "html_content": "={{$json.html}}"
+      },
+      "type": "n8n-nodes-htmlcsstoimage.htmlCssToImage",
+      "typeVersion": 1,
+      "position": [
+        896,
+        0
+      ],
+      "id": "f8400ba1-bd22-44d1-88e2-edc22deea5c8",
+      "name": "HTML/CSS to Image",
+      "credentials": {
+        "htmlcsstoimgApi": {
+          "id": "bfcvpdMGSOpV5bWV",
+          "name": "Htmlcsstoimg account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "986907957",
+        "file": "={{ $json.image_url }}",
+        "additionalFields": {
+          "caption": "=Brief Nasdaq — sessions Asie/Europe ({{new Date().toLocaleDateString('fr-FR')}})"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        0
+      ],
+      "id": "604042f9-eb1b-4fbc-b0d2-19f0c9ba2714",
+      "name": "Send a photo message",
+      "webhookId": "ca4eba28-3dd0-4fcd-9bc3-667c174c0d2f",
+      "credentials": {
+        "telegramApi": {
+          "id": "phUIyrSJoQg9sbqZ",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "HTML/CSS to Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML/CSS to Image": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Paris",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1,
+    "errorWorkflow": "egmMp3QA6R2mWWgb"
+  },
+  "versionId": "ee96225c-e36c-4b6d-9ce8-b773e2386cc1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a73914e20d95456c3d7eb05c82e826e2483f0de8a50098bdc9db397330e31fc2"
+  },
+  "id": "egmMp3QA6R2mWWgb",
+  "tags": []
+}
