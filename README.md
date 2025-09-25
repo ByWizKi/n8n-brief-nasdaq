@@ -63,7 +63,7 @@ Voici quelques visuels du projet :
 ---
 
 ## Auteur
-Projet réalisé par **THIEBAUD**, étudiant en Master 2 Intelligence Artificielle.  
+Projet réalisé par **THIEBAUD Enzo**, étudiant en Master 2 Intelligence Artificielle.  
 À la recherche d'un **stage de fin d'études (5–6 mois dès février 2026)** sur Paris, Lyon ou Nice.  
 
 ---
