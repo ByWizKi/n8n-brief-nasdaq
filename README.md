@@ -34,7 +34,7 @@ Voici quelques visuels du projet :
 
 - **Schéma du workflow n8n**  
 *(capture ou export depuis n8n)*  
-![Workflow n8n](images/workflow.png)
+![Workflow n8n](images/n8n-workflow.png)
 
 - **Exemple du rapport PDF**  
 *(aperçu du tableau généré)*  
@@ -42,7 +42,7 @@ Voici quelques visuels du projet :
 
 - **Message reçu sur Telegram**  
 *(screenshot de la notification Telegram)*  
-![Message Telegram](images/telegram.png)
+![Message Telegram](images/message.png)
 
 ---
 
